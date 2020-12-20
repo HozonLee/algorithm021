@@ -1,12 +1,112 @@
 学习笔记
 
-#作业提交格式
-＃学号: G20200343180026  
-＃姓名:李超群  
-＃班级:21期  
-＃语言:Java  
-＃作业链接:https://github.com/HozonLee/algorithm021/tree/main/Week_03  
-＃总结链接:https://github.com/HozonLee/algorithm021/tree/main/Week_03/README.md
+#本周作业
+1、二叉树的最近公共祖先
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+
+百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+```
+递归解法：
+class Solution {
+
+    private TreeNode ans;
+
+    public Solution() {
+        this.ans = null;
+    }
+
+    private boolean dfs(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) return false;
+        boolean lson = dfs(root.left, p, q);
+        boolean rson = dfs(root.right, p, q);
+        if ((lson && rson) || ((root.val == p.val || root.val == q.val) && (lson || rson))) {
+            ans = root;
+        } 
+        return lson || rson || (root.val == p.val || root.val == q.val);
+    }
+
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        this.dfs(root, p, q);
+        return this.ans;
+    }
+}
+```
+2-组合
+```
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+
+public class Solution {
+
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (k <= 0 || n < k) {
+            return res;
+        }
+        Deque<Integer> path = new ArrayDeque<>();
+        dfs(n, k, 1, path, res);
+        return res;
+    }
+
+    private void dfs(int n, int k, int begin, Deque<Integer> path, List<List<Integer>> res) {
+        if (path.size() == k) {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+        for (int i = begin; i <= n; i++) {
+            path.addLast(i);
+            System.out.println("递归之前 => " + path);
+            dfs(n, k, i + 1, path, res);
+            path.removeLast();
+            System.out.println("递归之后 => " + path);
+        }
+    }
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        int n = 5;
+        int k = 3;
+        List<List<Integer>> res = solution.combine(n, k);
+        System.out.println(res);
+    }
+}
+```
+剪枝优化后：
+```
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+
+public class Solution {
+
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (k <= 0 || n < k) {
+            return res;
+        }
+        Deque<Integer> path = new ArrayDeque<>();
+        dfs(n, k, 1, path, res);
+        return res;
+    }
+
+    private void dfs(int n, int k, int index, Deque<Integer> path, List<List<Integer>> res) {
+        if (path.size() == k) {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+
+        // 只有这里 i <= n - (k - path.size()) + 1 与参考代码 1 不同
+        for (int i = index; i <= n - (k - path.size()) + 1; i++) {
+            path.addLast(i);
+            dfs(n, k, i + 1, path, res);
+            path.removeLast();
+        }
+    }
+}
+```
 
 #学习笔记
 树的面试题解法，一般都是递归：
